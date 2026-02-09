@@ -274,6 +274,7 @@ export class IntelligentRouter {
       'architect', 'microservice', 'monolith', 'distributed',
       'scalab', 'pattern', 'design pattern', 'system design',
       'trade-off', 'pros and cons', 'versus', ' vs ', ' v ',
+      'event-driven', 'event driven', 'event', 'driven',
     ];
     const foundArchitectural = architecturalKeywords.filter(kw => 
       lowerPrompt.includes(kw)

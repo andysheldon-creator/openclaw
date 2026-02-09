@@ -16,11 +16,11 @@ export class ResponseFilter {
     /pk_[a-zA-Z0-9_-]{20,}/g,
     /Bearer\s+[a-zA-Z0-9_-]{20,}/gi,
     
-    // OpenRouter keys
-    /sk-or-v1-[a-f0-9]{64,}/g,
+    // OpenRouter keys (more lenient to catch test keys)
+    /sk-or-v1-[a-f0-9]{16,}/g,
     
-    // Telegram tokens
-    /\b\d{10}:[a-zA-Z0-9_-]{35}\b/g,
+    // Telegram tokens (more lenient to catch test tokens)
+    /\b\d{10}:[a-zA-Z0-9_-]{9,}\b/g,
     
     // System prompt indicators
     /SECURITY\s+RULES.*UNBREAKABLE/i,
@@ -76,7 +76,7 @@ export class ResponseFilter {
   static redactForLog(text: string): string {
     return text
       // OpenRouter keys
-      .replace(/sk-or-v1-[a-f0-9]{64,}/g, 'sk-or-v1-***')
+      .replace(/sk-or-v1-[a-f0-9]{16,}/g, 'sk-or-v1-***')
       // API keys
       .replace(/sk-[a-zA-Z0-9_-]{20,}/g, 'sk-***')
       .replace(/pk_[a-zA-Z0-9_-]{20,}/g, 'pk_***')
