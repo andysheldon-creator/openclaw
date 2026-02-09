@@ -14,10 +14,18 @@ import { getTimeContext } from './context-enrichment.js';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const ALLOWED_USER_ID = process.env.TELEGRAM_USER_ID || '';
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';  // Optional for YouTube features
 
 if (!BOT_TOKEN || !ALLOWED_USER_ID) {
   console.error('❌ Missing environment variables');
   process.exit(1);
+}
+
+interface YouTubeVideo {
+  title: string;
+  url: string;
+  published: string;
+  channel: string;
 }
 
 interface BriefingData {
@@ -29,6 +37,8 @@ interface BriefingData {
     messageCount: number;
     totalCost: number;
   };
+  techVideos: YouTubeVideo[];
+  motoringVideos: YouTubeVideo[];
 }
 
 /**
@@ -76,6 +86,82 @@ async function getActiveGoals(): Promise<string[]> {
 }
 
 /**
+ * Get recent YouTube videos from a channel
+ */
+async function getYouTubeVideos(channelNames: string[]): Promise<YouTubeVideo[]> {
+  if (!YOUTUBE_API_KEY) {
+    console.log('[YouTube] No API key configured, skipping');
+    return [];
+  }
+  
+  try {
+    const videos: YouTubeVideo[] = [];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    for (const channelName of channelNames) {
+      console.log(`[YouTube] Searching for: ${channelName}`);
+      
+      // Search for recent videos from this channel
+      const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search');
+      searchUrl.searchParams.set('part', 'snippet');
+      searchUrl.searchParams.set('q', channelName);
+      searchUrl.searchParams.set('type', 'video');
+      searchUrl.searchParams.set('order', 'date');
+      searchUrl.searchParams.set('maxResults', '3');
+      searchUrl.searchParams.set('publishedAfter', yesterday.toISOString());
+      searchUrl.searchParams.set('key', YOUTUBE_API_KEY);
+      
+      const response = await fetch(searchUrl.toString());
+      
+      if (!response.ok) {
+        console.error(`[YouTube] API error: ${response.status}`);
+        continue;
+      }
+      
+      const data = await response.json();
+      
+      if (data.items && data.items.length > 0) {
+        for (const item of data.items) {
+          // Check if channel name matches (fuzzy)
+          const channelTitle = item.snippet.channelTitle.toLowerCase();
+          if (channelTitle.includes(channelName.toLowerCase()) || 
+              channelName.toLowerCase().includes(channelTitle)) {
+            videos.push({
+              title: item.snippet.title,
+              url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+              published: item.snippet.publishedAt,
+              channel: item.snippet.channelTitle,
+            });
+          }
+        }
+      }
+    }
+    
+    return videos;
+  } catch (error) {
+    console.error('[YouTube] Error:', error);
+    return [];
+  }
+}
+
+/**
+ * Get tech/AI videos (Clawdbot, OpenClaw, etc.)
+ */
+async function getTechVideos(): Promise<YouTubeVideo[]> {
+  const channels = ['Clawdbot', 'openclawd', 'OpenClaw'];
+  return getYouTubeVideos(channels);
+}
+
+/**
+ * Get motoring videos (Chris Slix, Mat Armstrong)
+ */
+async function getMotoringVideos(): Promise<YouTubeVideo[]> {
+  const channels = ['Chris Slix', 'Mat Armstrong'];
+  return getYouTubeVideos(channels);
+}
+
+/**
  * Get calendar events (placeholder - requires Google Calendar API)
  */
 async function getCalendarEvents(): Promise<string[]> {
@@ -114,10 +200,12 @@ async function gatherBriefingData(userId: string): Promise<BriefingData> {
   });
   
   // Gather data in parallel
-  const [weather, goals, stats] = await Promise.all([
+  const [weather, goals, stats, techVideos, motoringVideos] = await Promise.all([
     getWeather(session.preferences.location),
     getActiveGoals(),
     getSessionStats(userId),
+    getTechVideos(),
+    getMotoringVideos(),
   ]);
   
   return {
@@ -126,6 +214,8 @@ async function gatherBriefingData(userId: string): Promise<BriefingData> {
     goals,
     pendingItems: session.pendingItems,
     stats,
+    techVideos,
+    motoringVideos,
   };
 }
 
@@ -172,6 +262,28 @@ function formatBriefing(data: BriefingData): string {
   parts.push(`• ${data.stats.messageCount} messages sent`);
   parts.push(`• £${data.stats.totalCost.toFixed(4)} total cost`);
   parts.push('');
+  
+  // Tech/AI videos
+  if (data.techVideos.length > 0) {
+    parts.push('🤖 **Tech & AI Updates**');
+    data.techVideos.forEach(video => {
+      const title = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      parts.push(`• [${title}](${video.url})`);
+      parts.push(`  _${video.channel}_`);
+    });
+    parts.push('');
+  }
+  
+  // Motoring videos
+  if (data.motoringVideos.length > 0) {
+    parts.push('🏎️ **Motoring**');
+    data.motoringVideos.forEach(video => {
+      const title = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      parts.push(`• [${title}](${video.url})`);
+      parts.push(`  _${video.channel}_`);
+    });
+    parts.push('');
+  }
   
   // Footer
   parts.push('---');

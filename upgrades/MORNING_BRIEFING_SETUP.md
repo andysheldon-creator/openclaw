@@ -8,11 +8,13 @@ Sends a daily morning digest at 8:00 AM with:
 - 🎯 Active goals from memory
 - 📋 Pending items
 - 📊 Yesterday's activity stats (messages, cost)
+- 🤖 **NEW:** Tech & AI videos (Clawdbot, OpenClaw channels)
+- 🏎️ **NEW:** Motoring videos (Chris Slix, Mat Armstrong)
 
 **Example:**
 ```
 🌅 Good Morning, Andy!
-Monday, 10 February 2025
+Monday, 10 February 2026
 
 Weather
 ☀️ Partly cloudy +6°C
@@ -29,9 +31,62 @@ Weather
 • 47 messages sent
 • £0.0142 total cost
 
+🤖 Tech & AI Updates
+• [Building AI Agents with Claude - New Features](https://youtube.com/watch?v=...)
+  _Clawdbot_
+• [OpenClaw 2.0 Deep Dive](https://youtube.com/watch?v=...)
+  _openclawd_
+
+🏎️ Motoring
+• [Rebuilding a TOTALED Lamborghini Part 5](https://youtube.com/watch?v=...)
+  _Mat Armstrong_
+• [My NEW Project Car Revealed!](https://youtube.com/watch?v=...)
+  _Chris Slix_
+
 ---
 Have a productive day! Reply to chat or say "call me" for updates.
 ```
+
+---
+
+## Setup YouTube Integration
+
+### 1. Get YouTube Data API Key
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Create a new project or select existing
+3. Enable "YouTube Data API v3"
+4. Go to "Credentials" → "Create Credentials" → "API Key"
+5. Copy the API key
+
+### 2. Add to .env File
+
+```bash
+cd /home/oem/.openclaw/workspace/openclaw-fork/upgrades
+nano .env
+```
+
+Add line:
+```bash
+YOUTUBE_API_KEY=YOUR_API_KEY_HERE
+```
+
+Save (Ctrl+O, Enter, Ctrl+X)
+
+### 3. Test YouTube Integration
+
+```bash
+npm run briefing
+```
+
+Should now include YouTube sections if videos are found.
+
+**Note:** Without YouTube API key, briefing still works - just skips video sections.
+
+**YouTube API Quota:** 10,000 units/day (free tier)
+- Each search = 100 units
+- Morning briefing uses ~500 units/day (5 searches)
+- Well within free quota
 
 ---
 
