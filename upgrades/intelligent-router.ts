@@ -134,6 +134,17 @@ export class IntelligentRouter {
         };
       }
 
+      // Very complex tasks → Claude Sonnet (best quality)
+      if (analysis.complexity >= 0.7) {
+        return {
+          provider: 'openrouter',
+          model: 'anthropic/claude-3.5-sonnet',
+          reason: 'Complex task requiring Claude quality',
+          estimatedCost: 0.003, // £0.003/message
+          estimatedTime: 3,
+        };
+      }
+
       // Code tasks → Code-specialized model
       if (analysis.taskType === 'code') {
         return {
@@ -145,11 +156,11 @@ export class IntelligentRouter {
         };
       }
 
-      // Medium/complex → Best value model
+      // Medium complexity → Best value model
       return {
         provider: 'openrouter',
         model: 'meta-llama/llama-3.3-70b-instruct',
-        reason: 'Best value for quality',
+        reason: 'Medium complexity, best value',
         estimatedCost: 0.0003,
         estimatedTime: 3,
       };

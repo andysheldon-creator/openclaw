@@ -28,5 +28,16 @@
     "cost": 0,
     "responseTime": 25.889,
     "routingReason": "Complex task, using Pro subscription"
+  },
+  {
+    "timestamp": 1770653708101,
+    "provider": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "prompt": "Current time: Monday, February 9, 2026 at 04:15 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: Tell me a joke?",
+    "response": "Why did the AI go on a diet? *Lost bytes*. [REMEMBER: User requested a joke] I'll keep them short and bytesized.",
+    "cost": 0.000220896,
+    "tokensUsed": 468,
+    "responseTime": 1.371,
+    "routingReason": "Best value for quality"
   }
 ]
