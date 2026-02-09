@@ -135,12 +135,12 @@ export class IntelligentRouter {
   private routeCostOptimized(analysis: TaskAnalysis): RoutingDecision {
     // ALWAYS prefer OpenRouter for any task (cheap, fast, reliable)
     if (this.allowOpenRouter) {
-      // Simple/trivial tasks → Free models
-      if (analysis.complexity < 0.3) {
+      // Simple/medium tasks → Free models (up to 0.6 complexity)
+      if (analysis.complexity < 0.6) {
         return {
           provider: 'openrouter',
           model: 'google/gemma-3-4b-it:free',
-          reason: 'Simple task, free Gemma 3 4B model',
+          reason: 'Simple-medium task, free Gemma 3 4B model',
           estimatedCost: 0,
           estimatedTime: 2,
         };
