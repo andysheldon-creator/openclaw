@@ -220,6 +220,13 @@ async function gatherBriefingData(userId: string): Promise<BriefingData> {
 }
 
 /**
+ * Escape markdown special characters for Telegram
+ */
+function escapeMarkdown(text: string): string {
+  return text.replace(/([_*\[\]()~`>#+=|{}.!-])/g, '\\$1');
+}
+
+/**
  * Format briefing message
  */
 function formatBriefing(data: BriefingData): string {
@@ -267,9 +274,11 @@ function formatBriefing(data: BriefingData): string {
   if (data.techVideos.length > 0) {
     parts.push('🤖 **Tech & AI Updates**');
     data.techVideos.forEach(video => {
-      const title = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      const rawTitle = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      const title = escapeMarkdown(rawTitle);
+      const channel = escapeMarkdown(video.channel);
       parts.push(`• [${title}](${video.url})`);
-      parts.push(`  _${video.channel}_`);
+      parts.push(`  _${channel}_`);
     });
     parts.push('');
   }
@@ -278,9 +287,11 @@ function formatBriefing(data: BriefingData): string {
   if (data.motoringVideos.length > 0) {
     parts.push('🏎️ **Motoring**');
     data.motoringVideos.forEach(video => {
-      const title = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      const rawTitle = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      const title = escapeMarkdown(rawTitle);
+      const channel = escapeMarkdown(video.channel);
       parts.push(`• [${title}](${video.url})`);
-      parts.push(`  _${video.channel}_`);
+      parts.push(`  _${channel}_`);
     });
     parts.push('');
   }
