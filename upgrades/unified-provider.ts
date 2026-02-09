@@ -8,6 +8,7 @@
 import { IntelligentRouter, RoutingDecision } from './intelligent-router';
 import { OpenRouterProvider } from './openrouter-provider';
 import { ClaudeBrowserProvider } from './claude-browser-provider';
+import { CostTracker } from './cost-tracker';
 
 export interface UnifiedConfig {
   // API keys
@@ -49,8 +50,11 @@ export class UnifiedProvider {
   private openrouter?: OpenRouterProvider;
   private claudeBrowser?: ClaudeBrowserProvider;
   private ollamaBaseUrl: string;
+  private costTracker: CostTracker;
 
   constructor(config: UnifiedConfig) {
+    // Initialize cost tracker
+    this.costTracker = new CostTracker('./cost-tracking.json');
     // Initialize router
     this.router = new IntelligentRouter({
       strategy: config.strategy || 'cost-optimized',
@@ -124,6 +128,19 @@ export class UnifiedProvider {
 
       // Add response time
       response.responseTime = (Date.now() - startTime) / 1000;
+
+      // Log request for cost tracking
+      this.costTracker.logRequest({
+        timestamp: startTime,
+        provider: response.provider as any,
+        model: response.model,
+        prompt: userMessage.content,
+        response: response.content,
+        cost: response.cost,
+        tokensUsed: response.tokensUsed,
+        responseTime: response.responseTime,
+        routingReason: response.routingReason,
+      });
 
       return response;
 
@@ -246,12 +263,22 @@ export class UnifiedProvider {
    * Get statistics for all providers
    */
   async getStats(): Promise<any> {
-    // TODO: Implement usage tracking
-    return {
-      totalRequests: 0,
-      totalCost: 0,
-      byProvider: {},
-    };
+    return this.costTracker.exportDashboardData();
+  }
+
+  /**
+   * Get cost tracker instance
+   */
+  getCostTracker(): CostTracker {
+    return this.costTracker;
+  }
+
+  /**
+   * Generate HTML dashboard
+   */
+  generateDashboard(outputPath: string = './dashboard.html'): void {
+    const { generateDashboard } = require('./generate-dashboard');
+    generateDashboard(this.costTracker, outputPath);
   }
 }
 
