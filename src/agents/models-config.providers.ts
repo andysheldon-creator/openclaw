@@ -17,6 +17,10 @@ import {
   SYNTHETIC_MODEL_CATALOG,
 } from "./synthetic-models.js";
 import { discoverVeniceModels, VENICE_BASE_URL } from "./venice-models.js";
+import {
+  discoverOpenRouterModels,
+  OPENROUTER_BASE_URL,
+} from "./openrouter-models.js";
 
 type ModelsConfig = NonNullable<OpenClawConfig["models"]>;
 export type ProviderConfig = NonNullable<ModelsConfig["providers"]>[string];
@@ -405,6 +409,15 @@ async function buildVeniceProvider(): Promise<ProviderConfig> {
   };
 }
 
+async function buildOpenRouterProvider(): Promise<ProviderConfig> {
+  const models = await discoverOpenRouterModels();
+  return {
+    baseUrl: OPENROUTER_BASE_URL,
+    api: "openai-completions",
+    models,
+  };
+}
+
 async function buildOllamaProvider(): Promise<ProviderConfig> {
   const models = await discoverOllamaModels();
   return {
@@ -483,6 +496,13 @@ export async function resolveImplicitProviders(params: {
     resolveApiKeyFromProfiles({ provider: "venice", store: authStore });
   if (veniceKey) {
     providers.venice = { ...(await buildVeniceProvider()), apiKey: veniceKey };
+  }
+
+  const openrouterKey =
+    resolveEnvApiKeyVarName("openrouter") ??
+    resolveApiKeyFromProfiles({ provider: "openrouter", store: authStore });
+  if (openrouterKey) {
+    providers.openrouter = { ...(await buildOpenRouterProvider()), apiKey: openrouterKey };
   }
 
   const qwenProfiles = listProfilesForProvider(authStore, "qwen-portal");
