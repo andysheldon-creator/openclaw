@@ -10,7 +10,8 @@
     "test:full": "tsx test-suite.ts",
     "test:security": "tsx test-security.ts",
     "test:complexity": "tsx test-complexity.ts",
-    "checkin": "tsx proactive-checkin.ts"
+    "checkin": "tsx proactive-checkin.ts",
+    "briefing": "tsx morning-briefing.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.4",

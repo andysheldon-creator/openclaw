@@ -5,7 +5,7 @@
 
 ---
 
-## ✅ Implemented Features (9 Total)
+## ✅ Implemented Features (10 Total)
 
 ### CORE PATTERNS (6/6) - 100% Complete
 
@@ -79,20 +79,30 @@
    - Auto-cleanup after processing
    - Cost: ~£0.003-0.01 per image
 
+10. **Morning Briefing** ✅ NEW!
+   - File: `morning-briefing.ts`
+   - Daily digest at 8:00 AM
+   - Weather forecast (wttr.in, no API key needed)
+   - Active goals from memory
+   - Pending items from session
+   - Yesterday's activity stats
+   - Time-gated (only 7-9 AM)
+   - Cost: FREE (one Telegram message/day)
+
 ---
 
 ## 📊 Feature Summary
 
-**Total Features:** 9  
+**Total Features:** 10  
 **Core Patterns:** 6/6 (100%)  
 **High Priority:** 1/1 (100%)  
 **Medium Priority:** 2/2 (100%)  
+**Bonus Features:** 1/1 (100%)  
 
 **LOW Priority (skipped):**
 - Voice transcription (rarely used)
-- Morning briefing (manual check is fine)
 - Supabase/vector search (local JSON sufficient)
-- Calendar/email integration (too much API setup)
+- Calendar/email integration (too much API setup for now)
 - OS daemon (PM2 works great)
 
 ---
@@ -174,6 +184,32 @@ Bot: "Hey Andy! It's been a while - how's the Mirror deployment going?
 [Reason: Long work-hours silence + approaching goal deadline]
 ```
 
+### 6. Morning Briefing
+```
+[Every morning at 8:00 AM]
+
+Bot: "🌅 Good Morning, Andy!
+     Monday, 10 February 2026
+     
+     Weather
+     ☀️ Light drizzle +8°C
+     
+     🎯 Active Goals
+     • Deploy OptimiserClaw by Feb 19
+     • Complete Mirror Phase 1
+     
+     📋 Pending Items
+     • Review security implementation
+     • Test image analysis
+     
+     📊 Yesterday's Activity
+     • 47 messages sent
+     • £0.0142 total cost
+     
+     ---
+     Have a productive day! Reply to chat or say 'call me' for updates."
+```
+
 ---
 
 ## 🔧 Technical Details
@@ -228,6 +264,7 @@ CLAUDE_SESSION_TOKEN=sk-ant-sid02-...    # (unused, browser disabled)
 | Text messages (complex) | £0.003 | 10/day | £0.90 |
 | Image analysis | £0.005 | 2/day | £0.30 |
 | Proactive check-ins | £0.0003 | 48/day (2-3 send) | £0.42 |
+| Morning briefing | £0 | 1/day | £0.00 |
 | **TOTAL** | | | **£10.62/mo** |
 
 **vs Direct Claude API:** £150/month  
@@ -288,11 +325,15 @@ CLAUDE_SESSION_TOKEN=sk-ant-sid02-...    # (unused, browser disabled)
 - [x] Core patterns (6/6)
 - [x] High priority features (1/1)
 - [x] Medium priority features (2/2)
+- [x] Bonus feature: Morning briefing
 - [x] Security implementation (15/15 tests pass)
+- [x] Regression test suite (41 tests, 80% pass)
 - [x] Documentation complete
 - [x] All code committed to GitHub
 - [x] Bot running in production (PM2)
+- [ ] Fix OpenRouter API key (expired)
 - [ ] Proactive check-ins enabled (systemd)
+- [ ] Morning briefing enabled (systemd)
 - [ ] Test image analysis (manual)
 
 ---
