@@ -95,8 +95,12 @@ export class UnifiedProvider {
       throw new Error('No user message provided');
     }
 
-    // Route to best provider
-    const decision = this.router.route(userMessage.content, context);
+    // For routing, use ONLY the context array (which should be original message)
+    // This prevents memory/enrichment from affecting routing decisions
+    const routingPrompt = context && context.length > 0 ? context[0] : userMessage.content;
+    
+    // Route to best provider based on ORIGINAL message
+    const decision = this.router.route(routingPrompt, []);
 
     console.log(`🎯 Routing to: ${decision.provider} (${decision.model})`);
     console.log(`📝 Reason: ${decision.reason}`);
@@ -204,7 +208,13 @@ export class UnifiedProvider {
     const response = await this.openrouter.chat(messages, decision.model);
 
     if (response.error) {
+      console.error(`❌ OpenRouter returned error for model ${decision.model}:`, response.error);
       throw new Error(response.error);
+    }
+
+    if (!response.content || response.content.length === 0) {
+      console.error(`❌ OpenRouter returned empty content for model ${decision.model}`);
+      console.error('   Full response:', JSON.stringify(response));
     }
 
     return {

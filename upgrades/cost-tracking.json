@@ -138,5 +138,93 @@
     "tokensUsed": 648,
     "responseTime": 2.749,
     "routingReason": "Complex task requiring Claude quality"
+  },
+  {
+    "timestamp": 1770659690660,
+    "provider": "openrouter",
+    "model": "qwen/qwen-2.5-coder-32b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n\n\nCurrent time: Monday, February 9, 2026 at 05:54 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: Tell me a joke?",
+    "response": "Sure, here's a programming joke for you:\n\nWhy do programmers prefer dark mode?\n\nBecause light attracts bugs. 🐜✨\n\nGot it! [REMEMBER: User enjoys programming humor, responded to dark mode joke]",
+    "cost": 0.00029736,
+    "tokensUsed": 630,
+    "responseTime": 2.21,
+    "routingReason": "Code task, specialized model"
+  },
+  {
+    "timestamp": 1770659772659,
+    "provider": "openrouter",
+    "model": "qwen/qwen-2.5-coder-32b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n\n\nCurrent time: Monday, February 9, 2026 at 05:56 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: hello",
+    "response": "Hey! How’s it going with React/TypeScript? Need help with anything specific? [GOAL: Track model usage in conversations | DEADLINE: 2026-03-09]",
+    "cost": 0.000294528,
+    "tokensUsed": 624,
+    "responseTime": 2.046,
+    "routingReason": "Code task, specialized model"
+  },
+  {
+    "timestamp": 1770660578226,
+    "provider": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n- Track model usage in conversations (by 2026-03-09)\n\n\nCurrent time: Monday, February 9, 2026 at 06:09 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: 2+2",
+    "response": "**Answer:** 4 \n[REMEMBER: User performed simple math test] I've noted that for future reference.",
+    "cost": 0.000322848,
+    "tokensUsed": 684,
+    "responseTime": 1.311,
+    "routingReason": "Medium complexity, best value"
+  },
+  {
+    "timestamp": 1770660588931,
+    "provider": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n- User performed simple math test\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n- Track model usage in conversations (by 2026-03-09)\n\n\nCurrent time: Monday, February 9, 2026 at 06:09 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: 100+122",
+    "response": "**Calculation result:** 222 [REMEMBER: User performed math calculation: 100+122=222] Got it, calculation done!",
+    "cost": 0.000290752,
+    "tokensUsed": 616,
+    "responseTime": 2.043,
+    "routingReason": "Medium complexity, best value"
+  },
+  {
+    "timestamp": 1770661091335,
+    "provider": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n- User performed simple math test\n- User performed math calculation: 100+122=222\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n- Track model usage in conversations (by 2026-03-09)\n\n\nCurrent time: Monday, February 9, 2026 at 06:18 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: 5+5",
+    "response": "10 [REMEMBER: User performed math calculation: 5+5=10] Simple math test result stored.",
+    "cost": 0.000294056,
+    "tokensUsed": 623,
+    "responseTime": 2.471,
+    "routingReason": "Simple-medium task, Llama 3.3 70B (£0.0003/msg)"
+  },
+  {
+    "timestamp": 1770661115760,
+    "provider": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n- User performed simple math test\n- User performed math calculation: 100+122=222\n- User performed math calculation: 5+5=10\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n- Track model usage in conversations (by 2026-03-09)\n\n\nCurrent time: Monday, February 9, 2026 at 06:18 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: 500+500",
+    "response": "**Calculation:** 500 + 500 = 1000 [REMEMBER: User performed math calculation: 500+500=1000] Got it, result is 1000.",
+    "cost": 0.000307744,
+    "tokensUsed": 652,
+    "responseTime": 0.879,
+    "routingReason": "Simple-medium task, Llama 3.3 70B (£0.0003/msg)"
+  },
+  {
+    "timestamp": 1770661160604,
+    "provider": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n- User performed simple math test\n- User performed math calculation: 100+122=222\n- User performed math calculation: 5+5=10\n- User performed math calculation: 500+500=1000\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n- Track model usage in conversations (by 2026-03-09)\n\n\nCurrent time: Monday, February 9, 2026 at 06:19 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: nalyze and compare the architectural design patterns of microservices vs monolithic systems. Provide a comprehensive evaluation of the trade-offs, scalability considerations, and strategic recommendations for when to use each approach. Include detailed critique of common implementation mistakes.",
+    "response": "**Microservices vs Monolithic Systems**\n### Overview\nMicroservices and monolithic systems are two fundamental architectural design patterns. \n* **Monolithic**: A single, self-contained unit with all components tightly coupled.\n* **Microservices**: A collection of small, independent services communicating with each other.\n\n### Trade-offs\n* **Scalability**: Microservices scale individual components, while monolithic systems scale the entire application.\n* **Complexity**: Microservices introduce additional complexity due to service communication and management.\n* **Maintainability**: Microservices allow for easier maintenance and updates of individual components.\n\n### Scalability Considerations\n* **Horizontal scaling**: Microservices can be scaled independently, while monolithic systems require scaling the entire application.\n* **Load balancing**: Microservices require load balancing across multiple services, while monolithic systems balance load within the single unit.\n\n### Strategic Recommendations\n* Use **monolithic** for:\n\t+ Small applications with simple requirements\n\t+ Prototyping or proof-of-concept projects\n* Use **microservices** for:\n\t+ Large, complex applications with multiple components\n\t+ Applications requiring high scalability and flexibility\n\n### Common Implementation Mistakes\n* **Tight coupling**: Failing to maintain loose coupling between microservices.\n* **Inconsistent APIs**: Using inconsistent APIs across microservices.\n* **Insufficient monitoring**: Failing to implement adequate monitoring and logging for microservices.\n\n[REMEMBER: User prefers detailed comparisons of architectural design patterns] \nI've provided a comprehensive evaluation of microservices and monolithic systems. Let me know if you have any further questions.",
+    "cost": 0.00046728,
+    "tokensUsed": 990,
+    "responseTime": 18.046,
+    "routingReason": "Simple-medium task, Llama 3.3 70B (£0.0003/msg)"
+  },
+  {
+    "timestamp": 1770662061996,
+    "provider": "openrouter",
+    "model": "anthropic/claude-3.5-sonnet",
+    "prompt": "MEMORY:\n- User requested a joke\n- User working with React/TypeScript authentication\n- Explained useEffect vs useLayoutEffect to user with React/TypeScript context\n- Begin tracking model usage for cost optimization starting Feb 9, 2026\n- User working with React hooks, specifically useEffect vs useLayoutEffect implementation details\n- User enjoys programming humor, responded to dark mode joke\n- User performed simple math test\n- User performed math calculation: 100+122=222\n- User performed math calculation: 5+5=10\n- User performed math calculation: 500+500=1000\n- User prefers detailed comparisons of architectural design patterns\n\nACTIVE GOALS:\n- Track model usage in conversations\n- Track daily model usage and costs (by 2026-03-09)\n- Add weather API integration to OptimiserClaw (by 2026-03-01)\n- Track model usage in conversations (by 2026-03-09)\n\n\nCurrent time: Monday, February 9, 2026 at 06:34 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: Analyze and compare the architectural design patterns of microservices vs monolithic systems. Provide a comprehensive evaluation of the trade-offs, scalability considerations, and strategic recommendations for when to use each approach. Include detailed critique of common implementation mistakes.",
+    "response": "Here's a detailed architectural comparison, optimized for mobile reading:\n\n**Microservices vs Monolithic: Core Trade-offs**\n\n*Microservices Pros:*\n- Independent scaling\n- Technology flexibility per service\n- Faster deployments\n- Better fault isolation\n- Team autonomy\n\n*Microservices Cons:*\n- Distributed system complexity\n- Network latency overhead\n- More complex testing\n- Higher initial development cost\n- Operational complexity\n\n*Monolithic Pros:*\n- Simpler development workflow\n- Lower initial complexity\n- Easier testing\n- Better performance (no network hops)\n- Simpler deployment\n\n*Monolithic Cons:*\n- Scale as single unit\n- Technology lock-in\n- Harder to maintain as size grows\n- Longer deployment cycles\n- Team coordination challenges\n\n**Common Implementation Mistakes:**\n\n*Microservices:*\n1. Premature adoption\n2. Wrong service boundaries\n3. Shared databases\n4. Synchronous communication overuse\n5. Missing service discovery\n6. Inadequate monitoring\n\n*Monolithic:*\n1. Poor modularity\n2. Tight coupling\n3. No clear domain boundaries\n4. Monolithic database\n5. Big bang deployments\n\n**Strategic Recommendations:**\n\n*Choose Microservices when:*\n- Large team (50+ developers)\n- Different scaling needs per component\n- Need technology flexibility\n- Complex domain with clear boundaries\n- Strong DevOps capabilities\n\n*Choose Monolithic when:*\n- Small team (<10 developers)\n- Simple domain\n- Early stage startup\n- Limited operational resources\n- Need rapid development\n\n*Migration Strategy:*\n1. Start monolithic\n2. Design with modularity\n3. Extract services gradually\n4. Use strangler pattern\n5. Prioritize high-value services\n\n[REMEMBER: User values detailed architectural comparisons with implementation details]\n\nNeed any specific aspect explained further?",
+    "cost": 0,
+    "tokensUsed": 1175,
+    "responseTime": 11.823,
+    "routingReason": "Complex task requiring Claude quality"
   }
 ]

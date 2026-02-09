@@ -5,7 +5,13 @@
     "Explained useEffect vs useLayoutEffect to user with React/TypeScript context",
     "Begin tracking model usage for cost optimization starting Feb 9, 2026",
     "User working with React hooks, specifically useEffect vs useLayoutEffect implementation details",
-    "User enjoys programming humor, responded to dark mode joke"
+    "User enjoys programming humor, responded to dark mode joke",
+    "User performed simple math test",
+    "User performed math calculation: 100+122=222",
+    "User performed math calculation: 5+5=10",
+    "User performed math calculation: 500+500=1000",
+    "User prefers detailed comparisons of architectural design patterns",
+    "User values detailed architectural comparisons with implementation details"
   ],
   "goals": [
     {
@@ -21,8 +27,13 @@
       "text": "Add weather API integration to OptimiserClaw",
       "deadline": "2026-03-01",
       "createdAt": "2026-02-09T17:50:32.662Z"
+    },
+    {
+      "text": "Track model usage in conversations",
+      "deadline": "2026-03-09",
+      "createdAt": "2026-02-09T17:56:14.706Z"
     }
   ],
   "completedGoals": [],
-  "lastUpdated": "2026-02-09T17:52:31.883Z"
+  "lastUpdated": "2026-02-09T18:34:33.821Z"
 }

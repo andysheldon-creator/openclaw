@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsx optimiser-bot.ts",
     "dev": "tsx watch optimiser-bot.ts",
-    "test": "tsx test-router.ts"
+    "test": "tsx test-router.ts",
+    "checkin": "tsx proactive-checkin.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.4",

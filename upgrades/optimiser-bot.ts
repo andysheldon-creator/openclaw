@@ -14,6 +14,8 @@ import { enrichPrompt, getTimeContext } from './context-enrichment.js';
 import { UnifiedProvider } from './unified-provider.js';
 import { InputSanitizer } from './input-sanitizer.js';
 import { ResponseFilter } from './response-filter.js';
+import { updateSession, getSessionStats, getSessionContext } from './session-tracker.js';
+import { downloadImage, analyzeImage, cleanupImage, getImageSize } from './image-handler.js';
 
 // ============================================================
 // CONFIGURATION
@@ -186,9 +188,89 @@ bot.on('message:text', async (ctx) => {
     // 11. Log stats
     logStats(response.provider, response.cost, elapsedMs);
     
+    // 12. Update session state
+    await updateSession(userId, safeMessage, cleanText, response.provider, response.cost);
+    console.log(`[Session] State updated`);
+    
   } catch (error: any) {
     console.error('[Error]', error);
     await ctx.reply(`❌ Error: ${error.message || 'Something went wrong'}`);
+  }
+});
+
+// ============================================================
+// PHOTO/IMAGE HANDLER
+// ============================================================
+
+bot.on('message:photo', async (ctx) => {
+  const startTime = Date.now();
+  const userId = ctx.from?.id.toString() || 'unknown';
+  const caption = ctx.message.caption || 'Analyze this image';
+  
+  console.log(`\n[Photo] From: ${ctx.from?.username || ctx.from?.id}`);
+  console.log(`[Photo] Caption: ${caption}`);
+  
+  try {
+    await ctx.replyWithChatAction('typing');
+    
+    // Get the largest photo size
+    const photos = ctx.message.photo;
+    const largestPhoto = photos[photos.length - 1];
+    
+    console.log(`[Photo] File ID: ${largestPhoto.file_id}`);
+    console.log(`[Photo] Size: ${largestPhoto.width}x${largestPhoto.height}`);
+    
+    // Get file URL from Telegram
+    const file = await ctx.api.getFile(largestPhoto.file_id);
+    const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${file.file_path}`;
+    
+    // Download image
+    await ctx.reply('📥 Downloading image...');
+    const imagePath = await downloadImage(fileUrl, largestPhoto.file_id);
+    const sizeMB = await getImageSize(imagePath);
+    
+    console.log(`[Photo] Downloaded: ${sizeMB.toFixed(2)} MB`);
+    
+    // Analyze image
+    await ctx.reply('🔍 Analyzing with Claude Vision...');
+    const analysis = await analyzeImage(imagePath, caption, OPENROUTER_API_KEY);
+    
+    if (analysis.error) {
+      await ctx.reply(`❌ Failed to analyze image: ${analysis.error}`);
+      await cleanupImage(imagePath);
+      return;
+    }
+    
+    const elapsedMs = Date.now() - startTime;
+    
+    console.log(`[Photo] Provider: ${analysis.provider}`);
+    console.log(`[Photo] Model: ${analysis.model}`);
+    console.log(`[Photo] Cost: £${analysis.cost.toFixed(6)}`);
+    console.log(`[Photo] Time: ${elapsedMs}ms`);
+    
+    // Send analysis
+    const chunks = chunkMarkdown(analysis.description, { platform: 'telegram' });
+    
+    for (const chunk of chunks) {
+      await ctx.reply(chunk, { parse_mode: 'Markdown' });
+    }
+    
+    // Add cost footer
+    await ctx.reply(`\n💰 Cost: £${analysis.cost.toFixed(6)} | ⏱️ ${elapsedMs}ms`);
+    
+    // Log stats
+    logStats(analysis.provider, analysis.cost, elapsedMs);
+    
+    // Update session
+    await updateSession(userId, `[Image: ${caption}]`, analysis.description, analysis.provider, analysis.cost);
+    console.log(`[Session] State updated`);
+    
+    // Cleanup
+    await cleanupImage(imagePath);
+    
+  } catch (error: any) {
+    console.error('[Photo Error]', error);
+    await ctx.reply(`❌ Error processing image: ${error.message || 'Something went wrong'}`);
   }
 });
 
@@ -215,19 +297,27 @@ Try asking me anything!`);
 });
 
 bot.command('stats', async (ctx) => {
-  const stats = getStats();
+  const userId = ctx.from?.id.toString() || '';
+  const providerStats = getStats();
+  const sessionStats = await getSessionStats(userId);
+  
   await ctx.reply(`📊 **Session Stats**
 
-**Messages:** ${stats.total}
-**Costs:**
-• Local: ${stats.local} messages (£0)
-• OpenRouter: ${stats.openrouter} messages (£${stats.openrouterCost.toFixed(4)})
-• Claude: ${stats.claude} messages (£0)
+**Messages:** ${sessionStats.messageCount}
+**Session Duration:** ${sessionStats.sessionDuration}
+**Last Activity:** ${sessionStats.lastActivity}
 
-**Total Cost:** £${stats.totalCost.toFixed(4)}
-**Avg Response:** ${stats.avgResponseTime}ms
+**Routing:**
+• Local: ${providerStats.local} messages (£0)
+• OpenRouter: ${providerStats.openrouter} messages (£${providerStats.openrouterCost.toFixed(4)})
+• Claude: ${providerStats.claude} messages (£0)
 
-**Savings:** ${stats.savingsPercent}% vs all-Claude`);
+**Cost:**
+• Total: £${sessionStats.totalCost.toFixed(4)}
+• Avg per message: £${sessionStats.avgCostPerMessage.toFixed(6)}
+• Avg response time: ${providerStats.avgResponseTime}ms
+
+**Savings:** ${providerStats.savingsPercent}% vs all-Claude`);
 });
 
 bot.command('memory', async (ctx) => {
