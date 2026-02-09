@@ -105,6 +105,11 @@ export class OpenRouterProvider {
       };
 
     } catch (error: any) {
+      console.error('❌ OpenRouter error:', error.message);
+      if (error.response) {
+        console.error('   Status:', error.response.status);
+        console.error('   Data:', JSON.stringify(error.response.data));
+      }
       return {
         content: '',
         model: model || this.defaultModel,
