@@ -139,8 +139,8 @@ export class IntelligentRouter {
       if (analysis.complexity < 0.3) {
         return {
           provider: 'openrouter',
-          model: 'meta-llama/llama-3.3-70b-instruct:free',
-          reason: 'Simple task, free Llama 3.3 70B model',
+          model: 'google/gemma-3-4b-it:free',
+          reason: 'Simple task, free Gemma 3 4B model',
           estimatedCost: 0,
           estimatedTime: 2,
         };
