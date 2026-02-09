@@ -170,13 +170,29 @@ export async function completeGoal(searchText: string): Promise<string> {
 
 /**
  * Get memory context for prompts
+ * Includes both long-term (MEMORY.md) and short-term (intent-memory.json)
  */
 export async function getMemoryContext(): Promise<string> {
-  const memory = await loadMemory();
   const lines: string[] = [];
   
+  // 1. Load long-term curated memory (MEMORY.md)
+  try {
+    const memoryMdPath = join(process.cwd(), 'MEMORY.md');
+    const memoryMd = await readFile(memoryMdPath, 'utf-8');
+    if (memoryMd.trim()) {
+      lines.push('📚 LONG-TERM MEMORY (curated):');
+      lines.push(memoryMd.trim());
+      lines.push('');
+    }
+  } catch (error) {
+    // MEMORY.md not found, skip
+  }
+  
+  // 2. Load short-term memory (facts/goals from tags)
+  const memory = await loadMemory();
+  
   if (memory.facts.length > 0) {
-    lines.push('MEMORY:');
+    lines.push('📝 SHORT-TERM MEMORY (recent facts):');
     memory.facts.forEach(fact => lines.push(`- ${fact}`));
     lines.push('');
   }
