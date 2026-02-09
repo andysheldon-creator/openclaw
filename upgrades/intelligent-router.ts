@@ -1,0 +1,389 @@
+/**
+ * Intelligent Router
+ * 
+ * Automatically selects the best AI model/provider based on:
+ * - Task complexity
+ * - Task type (code, reasoning, simple query)
+ * - Cost vs quality trade-off
+ * - Response time requirements
+ */
+
+export interface RouterConfig {
+  strategy?: 'cost-optimized' | 'quality-first' | 'balanced';
+  maxResponseTime?: number; // seconds
+  allowLocal?: boolean;
+  allowOpenRouter?: boolean;
+  allowClaudeBrowser?: boolean;
+  allowCl audeAPI?: boolean;
+}
+
+export interface RoutingDecision {
+  provider: 'local' | 'openrouter' | 'claude-browser' | 'claude-api';
+  model: string;
+  reason: string;
+  estimatedCost: number; // GBP
+  estimatedTime: number; // seconds
+}
+
+export interface TaskAnalysis {
+  complexity: number; // 0-1 (0=trivial, 1=very complex)
+  taskType: 'code' | 'math' | 'reasoning' | 'creative' | 'factual' | 'general';
+  requiresFreshData: boolean;
+  isTimeCritical: boolean;
+  contextSize: 'small' | 'medium' | 'large';
+}
+
+export class IntelligentRouter {
+  private strategy: 'cost-optimized' | 'quality-first' | 'balanced';
+  private maxResponseTime: number;
+  private allowLocal: boolean;
+  private allowOpenRouter: boolean;
+  private allowClaudeBrowser: boolean;
+  private allowClaudeAPI: boolean;
+
+  constructor(config: RouterConfig = {}) {
+    this.strategy = config.strategy || 'cost-optimized';
+    this.maxResponseTime = config.maxResponseTime || 30;
+    this.allowLocal = config.allowLocal !== false;
+    this.allowOpenRouter = config.allowOpenRouter !== false;
+    this.allowClaudeBrowser = config.allowClaudeBrowser !== false;
+    this.allowClaudeAPI = config.allowClaudeAPI !== false;
+  }
+
+  /**
+   * Analyze task to understand complexity and type
+   */
+  analyzeTask(prompt: string, context?: string[]): TaskAnalysis {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Detect task type
+    let taskType: TaskAnalysis['taskType'] = 'general';
+    
+    if (this.isCodeTask(lowerPrompt)) {
+      taskType = 'code';
+    } else if (this.isMathTask(lowerPrompt)) {
+      taskType = 'math';
+    } else if (this.isReasoningTask(lowerPrompt)) {
+      taskType = 'reasoning';
+    } else if (this.isCreativeTask(lowerPrompt)) {
+      taskType = 'creative';
+    } else if (this.isFactualTask(lowerPrompt)) {
+      taskType = 'factual';
+    }
+
+    // Calculate complexity (0-1)
+    const complexity = this.calculateComplexity(prompt, context);
+
+    // Detect if fresh data needed
+    const requiresFreshData = /\b(today|now|current|latest|recent)\b/i.test(prompt);
+
+    // Detect time criticality
+    const isTimeCritical = /\b(urgent|quick|fast|immediately|asap)\b/i.test(prompt);
+
+    // Context size
+    const totalChars = prompt.length + (context?.join('').length || 0);
+    const contextSize: TaskAnalysis['contextSize'] = 
+      totalChars < 500 ? 'small' :
+      totalChars < 2000 ? 'medium' : 'large';
+
+    return {
+      complexity,
+      taskType,
+      requiresFreshData,
+      isTimeCritical,
+      contextSize,
+    };
+  }
+
+  /**
+   * Route task to best provider/model
+   */
+  route(prompt: string, context?: string[]): RoutingDecision {
+    const analysis = this.analyzeTask(prompt, context);
+
+    // Strategy: Cost-Optimized (default)
+    if (this.strategy === 'cost-optimized') {
+      return this.routeCostOptimized(analysis);
+    }
+
+    // Strategy: Quality-First
+    if (this.strategy === 'quality-first') {
+      return this.routeQualityFirst(analysis);
+    }
+
+    // Strategy: Balanced
+    return this.routeBalanced(analysis);
+  }
+
+  /**
+   * Cost-optimized routing: Use cheapest option that meets quality needs
+   */
+  private routeCostOptimized(analysis: TaskAnalysis): RoutingDecision {
+    // Trivial tasks → Local fast model (FREE)
+    if (analysis.complexity < 0.2 && this.allowLocal) {
+      return {
+        provider: 'local',
+        model: 'phi4-mini-reasoning',
+        reason: 'Simple task, local model sufficient',
+        estimatedCost: 0,
+        estimatedTime: 2,
+      };
+    }
+
+    // Code tasks → Local code model or qwen on OpenRouter
+    if (analysis.taskType === 'code' && analysis.complexity < 0.6) {
+      if (this.allowLocal) {
+        return {
+          provider: 'local',
+          model: 'qwen2.5-coder:7b',
+          reason: 'Code task, local code model',
+          estimatedCost: 0,
+          estimatedTime: 3,
+        };
+      }
+      if (this.allowOpenRouter) {
+        return {
+          provider: 'openrouter',
+          model: 'qwen/qwen-2.5-coder-32b-instruct',
+          reason: 'Code task, OpenRouter code model',
+          estimatedCost: 0.0003, // ~£0.0003 for 500 tokens
+          estimatedTime: 3,
+        };
+      }
+    }
+
+    // Medium complexity → OpenRouter cheap models
+    if (analysis.complexity < 0.7 && this.allowOpenRouter) {
+      return {
+        provider: 'openrouter',
+        model: 'meta-llama/llama-3.3-70b-instruct',
+        reason: 'Medium complexity, best value model',
+        estimatedCost: 0.0003, // ~£0.0003 for 500 tokens
+        estimatedTime: 4,
+      };
+    }
+
+    // Complex reasoning → Claude browser (FREE from Pro subscription)
+    if (analysis.complexity < 0.9 && this.allowClaudeBrowser) {
+      return {
+        provider: 'claude-browser',
+        model: 'claude-sonnet-4',
+        reason: 'Complex task, using Pro subscription',
+        estimatedCost: 0,
+        estimatedTime: 10,
+      };
+    }
+
+    // Very complex or critical → Claude API
+    if (this.allowClaudeAPI) {
+      return {
+        provider: 'claude-api',
+        model: 'claude-sonnet-4',
+        reason: 'Very complex task, premium model needed',
+        estimatedCost: 0.0015, // ~£0.0015 for 500 tokens
+        estimatedTime: 3,
+      };
+    }
+
+    // Fallback to best available
+    return this.fallbackRoute(analysis);
+  }
+
+  /**
+   * Quality-first routing: Use best model available
+   */
+  private routeQualityFirst(analysis: TaskAnalysis): RoutingDecision {
+    // Always prefer Claude for quality
+    if (this.allowClaudeAPI) {
+      return {
+        provider: 'claude-api',
+        model: 'claude-sonnet-4',
+        reason: 'Quality-first strategy',
+        estimatedCost: 0.0015,
+        estimatedTime: 3,
+      };
+    }
+
+    if (this.allowClaudeBrowser) {
+      return {
+        provider: 'claude-browser',
+        model: 'claude-sonnet-4',
+        reason: 'Quality-first, using browser provider',
+        estimatedCost: 0,
+        estimatedTime: 10,
+      };
+    }
+
+    // Fallback to OpenRouter or local
+    return this.routeCostOptimized(analysis);
+  }
+
+  /**
+   * Balanced routing: Balance cost and quality
+   */
+  private routeBalanced(analysis: TaskAnalysis): RoutingDecision {
+    // Simple → Local
+    if (analysis.complexity < 0.3 && this.allowLocal) {
+      return this.routeCostOptimized(analysis);
+    }
+
+    // Medium → OpenRouter
+    if (analysis.complexity < 0.7 && this.allowOpenRouter) {
+      return {
+        provider: 'openrouter',
+        model: 'meta-llama/llama-3.3-70b-instruct',
+        reason: 'Balanced: good quality, low cost',
+        estimatedCost: 0.0003,
+        estimatedTime: 4,
+      };
+    }
+
+    // Complex → Claude browser
+    if (this.allowClaudeBrowser) {
+      return {
+        provider: 'claude-browser',
+        model: 'claude-sonnet-4',
+        reason: 'Balanced: high quality, free',
+        estimatedCost: 0,
+        estimatedTime: 10,
+      };
+    }
+
+    // Fallback
+    return this.fallbackRoute(analysis);
+  }
+
+  /**
+   * Calculate task complexity (0-1)
+   */
+  private calculateComplexity(prompt: string, context?: string[]): number {
+    let complexity = 0.5; // Start at medium
+
+    // Length indicators
+    if (prompt.length < 50) complexity -= 0.2;
+    if (prompt.length > 200) complexity += 0.1;
+    if (prompt.length > 500) complexity += 0.2;
+
+    // Keyword indicators (increase complexity)
+    const complexKeywords = [
+      'analyze', 'design', 'architecture', 'optimize', 'refactor',
+      'explain', 'compare', 'evaluate', 'critique', 'improve',
+      'strategy', 'framework', 'system', 'comprehensive', 'detailed',
+    ];
+    
+    const foundKeywords = complexKeywords.filter(kw => 
+      prompt.toLowerCase().includes(kw)
+    ).length;
+    
+    complexity += Math.min(foundKeywords * 0.1, 0.3);
+
+    // Simple keywords (decrease complexity)
+    const simpleKeywords = ['what', 'when', 'where', 'list', 'name', 'is'];
+    const foundSimple = simpleKeywords.filter(kw => 
+      prompt.toLowerCase().startsWith(kw)
+    ).length;
+    
+    complexity -= foundSimple * 0.1;
+
+    // Context adds complexity
+    if (context && context.length > 2) complexity += 0.1;
+    if (context && context.length > 5) complexity += 0.1;
+
+    // Clamp to 0-1
+    return Math.max(0, Math.min(1, complexity));
+  }
+
+  /**
+   * Detect if task is code-related
+   */
+  private isCodeTask(prompt: string): boolean {
+    const codeKeywords = [
+      'code', 'function', 'class', 'method', 'api', 'debug',
+      'refactor', 'python', 'javascript', 'typescript', 'java',
+      'implement', 'algorithm', 'bug', 'error', 'compile',
+    ];
+    
+    return codeKeywords.some(kw => prompt.includes(kw));
+  }
+
+  /**
+   * Detect if task is math-related
+   */
+  private isMathTask(prompt: string): boolean {
+    const mathKeywords = ['calculate', 'solve', 'equation', 'math', 'formula'];
+    const hasNumbers = /\d/.test(prompt);
+    const hasMathSymbols = /[\+\-\*\/\=\(\)]/.test(prompt);
+    
+    return mathKeywords.some(kw => prompt.includes(kw)) || 
+           (hasNumbers && hasMathSymbols);
+  }
+
+  /**
+   * Detect if task requires reasoning
+   */
+  private isReasoningTask(prompt: string): boolean {
+    const reasoningKeywords = [
+      'why', 'how', 'explain', 'reason', 'because', 'analyze',
+      'evaluate', 'compare', 'pros and cons', 'trade-off',
+    ];
+    
+    return reasoningKeywords.some(kw => prompt.includes(kw));
+  }
+
+  /**
+   * Detect if task is creative
+   */
+  private isCreativeTask(prompt: string): boolean {
+    const creativeKeywords = [
+      'write', 'create', 'generate', 'story', 'poem', 'idea',
+      'brainstorm', 'imagine', 'creative', 'design',
+    ];
+    
+    return creativeKeywords.some(kw => prompt.includes(kw));
+  }
+
+  /**
+   * Detect if task is factual
+   */
+  private isFactualTask(prompt: string): boolean {
+    const factualKeywords = [
+      'what is', 'who is', 'when', 'where', 'definition',
+      'fact', 'information', 'lookup', 'find',
+    ];
+    
+    return factualKeywords.some(kw => prompt.includes(kw));
+  }
+
+  /**
+   * Fallback routing when preferred options unavailable
+   */
+  private fallbackRoute(analysis: TaskAnalysis): RoutingDecision {
+    if (this.allowLocal) {
+      return {
+        provider: 'local',
+        model: 'phi4-reasoning',
+        reason: 'Fallback to local model',
+        estimatedCost: 0,
+        estimatedTime: 5,
+      };
+    }
+
+    throw new Error('No routing options available');
+  }
+}
+
+// Example usage:
+/*
+const router = new IntelligentRouter({
+  strategy: 'cost-optimized',
+  maxResponseTime: 30,
+});
+
+const decision = router.route('Write a Python function to reverse a string');
+
+console.log('Provider:', decision.provider);
+console.log('Model:', decision.model);
+console.log('Reason:', decision.reason);
+console.log('Cost:', decision.estimatedCost, 'GBP');
+console.log('Time:', decision.estimatedTime, 'seconds');
+*/
