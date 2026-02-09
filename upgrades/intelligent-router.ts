@@ -135,13 +135,13 @@ export class IntelligentRouter {
   private routeCostOptimized(analysis: TaskAnalysis): RoutingDecision {
     // ALWAYS prefer OpenRouter for any task (cheap, fast, reliable)
     if (this.allowOpenRouter) {
-      // Simple/medium tasks → Free models (up to 0.6 complexity)
+      // Simple/medium tasks → Cheapest paid model (up to 0.6 complexity)
       if (analysis.complexity < 0.6) {
         return {
           provider: 'openrouter',
-          model: 'google/gemma-3-4b-it:free',
-          reason: 'Simple-medium task, free Gemma 3 4B model',
-          estimatedCost: 0,
+          model: 'meta-llama/llama-3.3-70b-instruct',
+          reason: 'Simple-medium task, Llama 3.3 70B (£0.0003/msg)',
+          estimatedCost: 0.0003,
           estimatedTime: 2,
         };
       }
@@ -262,31 +262,47 @@ export class IntelligentRouter {
    */
   private calculateComplexity(prompt: string, context?: string[]): number {
     let complexity = 0.5; // Start at medium
+    const lowerPrompt = prompt.toLowerCase();
 
     // Length indicators
     if (prompt.length < 50) complexity -= 0.2;
     if (prompt.length > 200) complexity += 0.1;
     if (prompt.length > 500) complexity += 0.2;
 
-    // Keyword indicators (increase complexity)
-    const complexKeywords = [
-      'analyze', 'design', 'architecture', 'optimize', 'refactor',
-      'explain', 'compare', 'evaluate', 'critique', 'improve',
-      'strategy', 'framework', 'system', 'comprehensive', 'detailed',
+    // High-complexity architectural/system design indicators
+    const architecturalKeywords = [
+      'architect', 'microservice', 'monolith', 'distributed',
+      'scalab', 'pattern', 'design pattern', 'system design',
+      'trade-off', 'pros and cons', 'versus', ' vs ', ' v ',
     ];
-    
-    const foundKeywords = complexKeywords.filter(kw => 
-      prompt.toLowerCase().includes(kw)
+    const foundArchitectural = architecturalKeywords.filter(kw => 
+      lowerPrompt.includes(kw)
     ).length;
-    
+    if (foundArchitectural > 0) {
+      complexity += Math.min(foundArchitectural * 0.15, 0.4); // Higher weight
+    }
+
+    // Multi-faceted analysis indicators (compare X vs Y, etc)
+    if (/\b(compare|contrast)\b.*\b(and|vs|versus|v)\b/i.test(prompt)) {
+      complexity += 0.2;
+    }
+
+    // Standard complex task keywords
+    const complexKeywords = [
+      'analyz', 'design', 'optim', 'refactor', 'explain',
+      'evaluat', 'critiqu', 'improv', 'strateg', 'framework',
+      'comprehensiv', 'detail', 'deep dive', 'in-depth',
+    ];
+    const foundKeywords = complexKeywords.filter(kw => 
+      lowerPrompt.includes(kw)
+    ).length;
     complexity += Math.min(foundKeywords * 0.1, 0.3);
 
     // Simple keywords (decrease complexity)
     const simpleKeywords = ['what', 'when', 'where', 'list', 'name', 'is', 'tell', 'joke', 'weather', 'hello', 'hi'];
     const foundSimple = simpleKeywords.filter(kw => 
-      prompt.toLowerCase().includes(kw)
+      lowerPrompt.includes(kw)
     ).length;
-    
     complexity -= Math.min(foundSimple * 0.15, 0.4);
 
     // Context adds small amount (don't let history inflate simple questions)
