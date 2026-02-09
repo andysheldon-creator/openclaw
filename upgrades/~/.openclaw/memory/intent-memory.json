@@ -11,7 +11,9 @@
     "User performed math calculation: 5+5=10",
     "User performed math calculation: 500+500=1000",
     "User prefers detailed comparisons of architectural design patterns",
-    "User values detailed architectural comparisons with implementation details"
+    "User values detailed architectural comparisons with implementation details",
+    "User prefers TypeScript",
+    "test"
   ],
   "goals": [
     {
@@ -32,8 +34,13 @@
       "text": "Track model usage in conversations",
       "deadline": "2026-03-09",
       "createdAt": "2026-02-09T17:56:14.706Z"
+    },
+    {
+      "text": "Deploy OptimiserClaw",
+      "deadline": "Feb 19",
+      "createdAt": "2026-02-09T19:47:55.388Z"
     }
   ],
   "completedGoals": [],
-  "lastUpdated": "2026-02-09T18:34:33.821Z"
+  "lastUpdated": "2026-02-09T19:47:55.389Z"
 }

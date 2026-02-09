@@ -7,6 +7,9 @@
     "start": "tsx optimiser-bot.ts",
     "dev": "tsx watch optimiser-bot.ts",
     "test": "tsx test-router.ts",
+    "test:full": "tsx test-suite.ts",
+    "test:security": "tsx test-security.ts",
+    "test:complexity": "tsx test-complexity.ts",
     "checkin": "tsx proactive-checkin.ts"
   },
   "dependencies": {
