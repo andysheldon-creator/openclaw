@@ -1,0 +1,119 @@
+{
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "agents": {
+    "defaults": {
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "workspace": "/home/oem/.openclaw/workspace",
+      "intelligentRouting": {
+        "enabled": true,
+        "verbose": true
+      },
+      "model": {
+        "primary": "openrouter/anthropic/claude-sonnet-4-5",
+        "fallbacks": ["openrouter/meta-llama/llama-3.3-70b-instruct"]
+      },
+      "models": {
+        "openrouter/anthropic/claude-sonnet-4-5": {
+          "alias": "claude-sonnet"
+        },
+        "openrouter/anthropic/claude-opus-4": {
+          "alias": "claude-opus"
+        },
+        "openrouter/meta-llama/llama-3.3-70b-instruct": {
+          "alias": "llama"
+        },
+        "openrouter/qwen/qwen2.5-coder-32b-instruct": {
+          "alias": "qwen-coder"
+        },
+        "openrouter/qwen/qwen2.5-72b-instruct": {
+          "alias": "qwen"
+        },
+        "openrouter/deepseek/deepseek-chat": {
+          "alias": "deepseek"
+        },
+        "openrouter/deepseek/deepseek-reasoner": {
+          "alias": "deepseek-r1"
+        },
+        "openrouter/google/gemini-2.0-flash-exp:free": {
+          "alias": "gemini-free"
+        },
+        "openrouter/google/gemini-flash-1.5": {
+          "alias": "gemini"
+        },
+        "openrouter/openai/gpt-4o": {
+          "alias": "gpt4o"
+        },
+        "openrouter/openai/gpt-4o-mini": {
+          "alias": "gpt4o-mini"
+        }
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "GENERATE_NEW_TOKEN_HERE"
+    },
+    "port": 18790,
+    "bind": "loopback",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "auth": {
+    "profiles": {
+      "openrouter:default": {
+        "provider": "openrouter",
+        "mode": "api_key"
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "YOUR_OPTIMIZED_BOT_TOKEN_HERE"
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "wizard": {
+    "lastRunAt": "2026-02-09T21:00:00.000Z",
+    "lastRunVersion": "2026.1.30",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.1.30+optimized",
+    "lastTouchedAt": "2026-02-09T21:00:00.000Z"
+  }
+}

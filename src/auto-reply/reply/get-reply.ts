@@ -6,6 +6,7 @@ import {
   resolveSessionAgentId,
   resolveAgentSkillsFilter,
 } from "../../agents/agent-scope.js";
+import { applyIntelligentRouting } from "../../agents/intelligent-routing-hook.js";
 import { resolveModelRefFromString } from "../../agents/model-selection.js";
 import { resolveAgentTimeoutMs } from "../../agents/timeout.js";
 import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../../agents/workspace.js";
@@ -234,6 +235,27 @@ export async function getReplyFromConfig(
   } = directiveResult.result;
   provider = resolvedProvider;
   model = resolvedModel;
+
+  // Apply intelligent routing if enabled
+  const userRequestedModel =
+    provider !== defaultProvider || model !== defaultModel ? `${provider}/${model}` : undefined;
+
+  const routingResult = applyIntelligentRouting({
+    message: cleanedBody || ctx.Body || "",
+    previousMessages: undefined, // TODO: Extract from session history
+    userRequestedModel,
+    defaultModel: `${defaultProvider}/${defaultModel}`,
+    config: cfg,
+  });
+
+  if (routingResult.shouldOverride && routingResult.provider && routingResult.model) {
+    provider = routingResult.provider;
+    model = routingResult.model;
+
+    if (cfg.agents?.defaults?.intelligentRouting?.verbose) {
+      defaultRuntime.log(`[Intelligent Routing] ${routingResult.reasoning}`);
+    }
+  }
 
   const inlineActionResult = await handleInlineActions({
     ctx,
