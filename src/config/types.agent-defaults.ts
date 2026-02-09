@@ -93,11 +93,20 @@ export type CliBackendConfig = {
   serialize?: boolean;
 };
 
+export type IntelligentRoutingConfig = {
+  /** Enable intelligent model routing based on complexity analysis (default: false). */
+  enabled?: boolean;
+  /** Log routing decisions for debugging (default: false). */
+  verbose?: boolean;
+};
+
 export type AgentDefaultsConfig = {
   /** Primary model and fallbacks (provider/model). */
   model?: AgentModelListConfig;
   /** Optional image-capable model and fallbacks (provider/model). */
   imageModel?: AgentModelListConfig;
+  /** Intelligent routing configuration for cost optimization. */
+  intelligentRouting?: IntelligentRoutingConfig;
   /** Model catalog with optional aliases (full provider/model keys). */
   models?: Record<string, AgentModelEntryConfig>;
   /** Agent working directory (preferred). Used as the default cwd for agent runs. */

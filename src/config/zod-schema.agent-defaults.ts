@@ -13,6 +13,14 @@ import {
   HumanDelaySchema,
 } from "./zod-schema.core.js";
 
+export const IntelligentRoutingSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    verbose: z.boolean().optional(),
+  })
+  .strict()
+  .optional();
+
 export const AgentDefaultsSchema = z
   .object({
     model: z
@@ -29,6 +37,7 @@ export const AgentDefaultsSchema = z
       })
       .strict()
       .optional(),
+    intelligentRouting: IntelligentRoutingSchema,
     models: z
       .record(
         z.string(),
