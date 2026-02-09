@@ -1,8 +1,28 @@
 {
   "facts": [
-    "User requested a joke"
+    "User requested a joke",
+    "User working with React/TypeScript authentication",
+    "Explained useEffect vs useLayoutEffect to user with React/TypeScript context",
+    "Begin tracking model usage for cost optimization starting Feb 9, 2026",
+    "User working with React hooks, specifically useEffect vs useLayoutEffect implementation details",
+    "User enjoys programming humor, responded to dark mode joke"
   ],
-  "goals": [],
+  "goals": [
+    {
+      "text": "Track model usage in conversations",
+      "createdAt": "2026-02-09T17:47:20.211Z"
+    },
+    {
+      "text": "Track daily model usage and costs",
+      "deadline": "2026-03-09",
+      "createdAt": "2026-02-09T17:49:40.122Z"
+    },
+    {
+      "text": "Add weather API integration to OptimiserClaw",
+      "deadline": "2026-03-01",
+      "createdAt": "2026-02-09T17:50:32.662Z"
+    }
+  ],
   "completedGoals": [],
-  "lastUpdated": "2026-02-09T16:15:09.473Z"
+  "lastUpdated": "2026-02-09T17:52:31.883Z"
 }

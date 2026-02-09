@@ -72,7 +72,11 @@ export class IntelligentRouter {
     }
 
     // Calculate complexity (0-1)
-    const complexity = this.calculateComplexity(prompt, context);
+    let complexity = this.calculateComplexity(prompt, context);
+    
+    // Reduce complexity for simple task types
+    if (taskType === 'creative' && prompt.length < 100) complexity *= 0.6;
+    if (taskType === 'factual') complexity *= 0.7;
 
     // Detect if fresh data needed
     const requiresFreshData = /\b(today|now|current|latest|recent)\b/i.test(prompt);
@@ -100,6 +104,8 @@ export class IntelligentRouter {
    */
   route(prompt: string, context?: string[]): RoutingDecision {
     const analysis = this.analyzeTask(prompt, context);
+
+    console.log(`📊 Task analysis: complexity=${analysis.complexity.toFixed(2)}, type=${analysis.taskType}`);
 
     // Strategy: Cost-Optimized (default)
     if (this.strategy === 'cost-optimized') {
@@ -270,16 +276,15 @@ export class IntelligentRouter {
     complexity += Math.min(foundKeywords * 0.1, 0.3);
 
     // Simple keywords (decrease complexity)
-    const simpleKeywords = ['what', 'when', 'where', 'list', 'name', 'is'];
+    const simpleKeywords = ['what', 'when', 'where', 'list', 'name', 'is', 'tell', 'joke', 'weather', 'hello', 'hi'];
     const foundSimple = simpleKeywords.filter(kw => 
-      prompt.toLowerCase().startsWith(kw)
+      prompt.toLowerCase().includes(kw)
     ).length;
     
-    complexity -= foundSimple * 0.1;
+    complexity -= Math.min(foundSimple * 0.15, 0.4);
 
-    // Context adds complexity
-    if (context && context.length > 2) complexity += 0.1;
-    if (context && context.length > 5) complexity += 0.1;
+    // Context adds small amount (don't let history inflate simple questions)
+    if (context && context.length > 5) complexity += 0.05;
 
     // Clamp to 0-1
     return Math.max(0, Math.min(1, complexity));
@@ -328,10 +333,10 @@ export class IntelligentRouter {
   private isCreativeTask(prompt: string): boolean {
     const creativeKeywords = [
       'write', 'create', 'generate', 'story', 'poem', 'idea',
-      'brainstorm', 'imagine', 'creative', 'design',
+      'brainstorm', 'imagine', 'creative', 'design', 'joke', 'funny',
     ];
     
-    return creativeKeywords.some(kw => prompt.includes(kw));
+    return creativeKeywords.some(kw => prompt.toLowerCase().includes(kw));
   }
 
   /**
