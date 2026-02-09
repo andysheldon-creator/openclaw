@@ -117,76 +117,57 @@ export class IntelligentRouter {
 
   /**
    * Cost-optimized routing: Use cheapest option that meets quality needs
+   * 
+   * PREFERENCE: OpenRouter > Local models (local models too slow on this hardware)
    */
   private routeCostOptimized(analysis: TaskAnalysis): RoutingDecision {
-    // Trivial tasks → Local fast model (FREE)
-    if (analysis.complexity < 0.2 && this.allowLocal) {
-      return {
-        provider: 'local',
-        model: 'phi4-mini-reasoning',
-        reason: 'Simple task, local model sufficient',
-        estimatedCost: 0,
-        estimatedTime: 2,
-      };
-    }
-
-    // Code tasks → Local code model or qwen on OpenRouter
-    if (analysis.taskType === 'code' && analysis.complexity < 0.6) {
-      if (this.allowLocal) {
+    // ALWAYS prefer OpenRouter for any task (cheap, fast, reliable)
+    if (this.allowOpenRouter) {
+      // Simple/trivial tasks → Small cheap models
+      if (analysis.complexity < 0.3) {
         return {
-          provider: 'local',
-          model: 'qwen2.5-coder:7b',
-          reason: 'Code task, local code model',
+          provider: 'openrouter',
+          model: 'google/gemini-2.0-flash-thinking-exp:free',
+          reason: 'Simple task, free model',
           estimatedCost: 0,
-          estimatedTime: 3,
+          estimatedTime: 2,
         };
       }
-      if (this.allowOpenRouter) {
+
+      // Code tasks → Code-specialized model
+      if (analysis.taskType === 'code') {
         return {
           provider: 'openrouter',
           model: 'qwen/qwen-2.5-coder-32b-instruct',
-          reason: 'Code task, OpenRouter code model',
-          estimatedCost: 0.0003, // ~£0.0003 for 500 tokens
+          reason: 'Code task, specialized model',
+          estimatedCost: 0.0003,
           estimatedTime: 3,
         };
       }
-    }
 
-    // Medium complexity → OpenRouter cheap models
-    if (analysis.complexity < 0.7 && this.allowOpenRouter) {
+      // Medium/complex → Best value model
       return {
         provider: 'openrouter',
         model: 'meta-llama/llama-3.3-70b-instruct',
-        reason: 'Medium complexity, best value model',
-        estimatedCost: 0.0003, // ~£0.0003 for 500 tokens
-        estimatedTime: 4,
+        reason: 'Best value for quality',
+        estimatedCost: 0.0003,
+        estimatedTime: 3,
       };
     }
 
-    // Complex reasoning → Claude browser (FREE from Pro subscription)
-    if (analysis.complexity < 0.9 && this.allowClaudeBrowser) {
+    // Fallback to local ONLY if OpenRouter unavailable
+    if (this.allowLocal) {
       return {
-        provider: 'claude-browser',
-        model: 'claude-sonnet-4',
-        reason: 'Complex task, using Pro subscription',
+        provider: 'local',
+        model: 'phi4-mini-reasoning',
+        reason: 'Fallback to local (OpenRouter unavailable)',
         estimatedCost: 0,
         estimatedTime: 10,
       };
     }
 
-    // Very complex or critical → Claude API
-    if (this.allowClaudeAPI) {
-      return {
-        provider: 'claude-api',
-        model: 'claude-sonnet-4',
-        reason: 'Very complex task, premium model needed',
-        estimatedCost: 0.0015, // ~£0.0015 for 500 tokens
-        estimatedTime: 3,
-      };
-    }
-
-    // Fallback to best available
-    return this.fallbackRoute(analysis);
+    // Last resort: error
+    throw new Error('No providers available - enable at least OpenRouter or local models');
   }
 
   /**

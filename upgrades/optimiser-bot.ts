@@ -3,12 +3,15 @@
  * Standalone bot combining Goda's patterns + intelligent routing
  */
 
+// Load environment variables
+import 'dotenv/config';
+
 import { Bot } from 'grammy';
-import { acquireLock, setupLockCleanup } from './lock-manager';
-import { chunkMarkdown } from './message-chunker';
-import { processIntents, getMemoryContext, getIntentSystemPrompt } from './intent-parser';
-import { enrichPrompt, getTimeContext } from './context-enrichment';
-import { IntelligentRouter } from './intelligent-router';
+import { acquireLock, setupLockCleanup } from './lock-manager.js';
+import { chunkMarkdown } from './message-chunker.js';
+import { processIntents, getMemoryContext, getIntentSystemPrompt } from './intent-parser.js';
+import { enrichPrompt, getTimeContext } from './context-enrichment.js';
+import { UnifiedProvider } from './unified-provider.js';
 
 // ============================================================
 // CONFIGURATION
@@ -43,16 +46,19 @@ setupLockCleanup();
 console.log('✓ Lock acquired');
 
 // ============================================================
-// INTELLIGENT ROUTER
+// UNIFIED PROVIDER
 // ============================================================
 
-const router = new IntelligentRouter({
-  openRouterApiKey: OPENROUTER_API_KEY,
+const provider = new UnifiedProvider({
+  openrouterApiKey: OPENROUTER_API_KEY,
   claudeSessionToken: CLAUDE_SESSION_TOKEN,
-  strategy: 'cost-optimized'
+  strategy: 'cost-optimized',
+  enableLocal: true,
+  enableOpenRouter: !!OPENROUTER_API_KEY,
+  enableClaudeBrowser: false, // DISABLED: Claude.ai DOM changed, selector broken
 });
 
-console.log('✓ Router initialized');
+console.log('✓ Provider initialized');
 
 // ============================================================
 // TELEGRAM BOT
@@ -105,29 +111,45 @@ bot.on('message:text', async (ctx) => {
     // 4. Get system prompt with intent detection
     const systemPrompt = buildSystemPrompt();
     
-    // 5. Route through intelligent router
-    console.log('[Router] Routing request...');
-    const result = await router.route({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: fullPrompt }
-      ]
-    });
+    // 5. Call unified provider
+    console.log('[Provider] Sending request...');
+    const response = await provider.chat([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: fullPrompt }
+    ]);
     
     const elapsedMs = Date.now() - startTime;
     
-    console.log(`[Router] Provider: ${result.provider}`);
-    console.log(`[Router] Cost: £${result.cost.toFixed(6)}`);
-    console.log(`[Router] Time: ${elapsedMs}ms`);
+    console.log(`[Provider] Provider: ${response.provider}`);
+    console.log(`[Provider] Model: ${response.model}`);
+    console.log(`[Provider] Cost: £${response.cost.toFixed(6)}`);
+    console.log(`[Provider] Time: ${elapsedMs}ms`);
+    console.log(`[Provider] Reason: ${response.routingReason}`);
+    console.log(`[Response] Raw length: ${response.content.length} chars`);
     
     // 6. Process intents (memory tags)
-    const { cleanText, actions } = await processIntents(result.response);
+    const { cleanText, actions } = await processIntents(response.content);
     
     if (actions.length > 0) {
       console.log(`[Intent] Actions: ${actions.join(', ')}`);
     }
     
-    // 7. Chunk and send response
+    console.log(`[Response] Clean length: ${cleanText.length} chars`);
+    
+    // 7. Handle empty response (all content was intent tags)
+    if (!cleanText.trim()) {
+      if (actions.length > 0) {
+        // If we had intent actions, confirm them
+        await ctx.reply(`✅ ${actions.join('\n')}`);
+      } else {
+        // Truly empty response
+        await ctx.reply('✅ Done');
+      }
+      logStats(response.provider, response.cost, elapsedMs);
+      return;
+    }
+    
+    // 8. Chunk and send response
     const chunks = chunkMarkdown(cleanText, { platform: 'telegram' });
     
     console.log(`[Response] Chunks: ${chunks.length}`);
@@ -136,12 +158,12 @@ bot.on('message:text', async (ctx) => {
       await ctx.reply(chunk, { parse_mode: 'Markdown' });
     }
     
-    // 8. Log stats
-    logStats(result.provider, result.cost, elapsedMs);
+    // 9. Log stats
+    logStats(response.provider, response.cost, elapsedMs);
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Error]', error);
-    await ctx.reply('❌ Sorry, something went wrong. Please try again.');
+    await ctx.reply(`❌ Error: ${error.message || 'Something went wrong'}`);
   }
 });
 
@@ -232,6 +254,10 @@ Building OptimiserClaw to reduce AI costs by 92% (£150/mo → £12/mo) using:
 - Get to the point
 
 ${getIntentSystemPrompt()}
+
+**IMPORTANT:** When you use intent tags like [REMEMBER:], ALWAYS include a confirmation message too.
+For example: "Got it! [REMEMBER: fact] I'll remember that for next time."
+Never send ONLY an intent tag with no other text.
 `.trim();
 }
 
@@ -269,18 +295,20 @@ function logStats(provider: string, cost: number, responseTime: number): void {
   stats.totalResponseTime += responseTime;
   stats.avgResponseTime = Math.round(stats.totalResponseTime / stats.total);
   
-  if (provider === 'local') {
+  if (provider === 'local' || provider.includes('ollama')) {
     stats.local++;
   } else if (provider === 'openrouter') {
     stats.openrouter++;
     stats.openrouterCost += cost;
-  } else if (provider === 'claude-browser') {
+  } else if (provider === 'claude-browser' || provider.includes('claude')) {
     stats.claude++;
   }
   
   // Calculate savings vs all-Claude (£0.012 per message)
   const allClaudeCost = stats.total * 0.012;
-  stats.savingsPercent = Math.round(((allClaudeCost - stats.totalCost) / allClaudeCost) * 100);
+  stats.savingsPercent = stats.total > 0 
+    ? Math.round(((allClaudeCost - stats.totalCost) / allClaudeCost) * 100)
+    : 0;
 }
 
 function getStats(): Stats {
@@ -293,8 +321,9 @@ function getStats(): Stats {
 
 console.log('\n🚀 Starting OptimiserClaw Test Bot...');
 console.log(`📱 Authorized user: ${ALLOWED_USER_ID || 'ANY (not recommended)'}`);
-console.log(`🧠 Router strategy: cost-optimized`);
+console.log(`🧠 Routing strategy: cost-optimized`);
 console.log(`📊 Features enabled: lock, chunking, intent, context`);
+console.log(`🔌 Providers: local=${true}, openrouter=${!!OPENROUTER_API_KEY}, claude=${!!CLAUDE_SESSION_TOKEN}`);
 
 bot.start({
   onStart: () => {

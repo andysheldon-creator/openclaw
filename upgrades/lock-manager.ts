@@ -5,6 +5,11 @@
 
 import { readFile, writeFile, unlink } from 'fs/promises';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const LOCK_FILE = process.env.OPENCLAW_LOCK_FILE || join(
   process.env.OPENCLAW_STATE_DIR || join(process.env.HOME || '~', '.openclaw'),
@@ -46,7 +51,7 @@ export async function acquireLock(): Promise<boolean> {
     const lockInfo: LockInfo = {
       pid: process.pid,
       startedAt: new Date().toISOString(),
-      host: require('os').hostname()
+      host: (await import('os')).hostname()
     };
     
     await writeFile(LOCK_FILE, JSON.stringify(lockInfo, null, 2));
@@ -90,7 +95,8 @@ export function setupLockCleanup(): void {
   // Cleanup on exit
   process.on('exit', () => {
     try {
-      require('fs').unlinkSync(LOCK_FILE);
+      const fs = require('fs');
+      fs.unlinkSync(LOCK_FILE);
     } catch {}
   });
   
@@ -112,7 +118,7 @@ export function setupLockCleanup(): void {
 }
 
 // CLI usage
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const command = process.argv[2];
   
   switch (command) {
@@ -150,7 +156,7 @@ if (require.main === module) {
       break;
       
     default:
-      console.log('Usage: node lock-manager.js <acquire|release|status>');
+      console.log('Usage: tsx lock-manager.ts <acquire|release|status>');
       process.exit(1);
   }
 }

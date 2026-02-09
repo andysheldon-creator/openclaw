@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": 1770651433774,
+    "provider": "claude-browser",
+    "model": "claude-sonnet-4",
+    "prompt": "Current time: Monday, February 9, 2026 at 03:37 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: Tell me about OptimiserClaw",
+    "response": "Hello! I can see you're in Derbyshire. How can I assist you today?",
+    "cost": 0,
+    "responseTime": 32.248,
+    "routingReason": "Complex task, using Pro subscription"
+  },
+  {
+    "timestamp": 1770651533897,
+    "provider": "claude-browser",
+    "model": "claude-sonnet-4",
+    "prompt": "Current time: Monday, February 9, 2026 at 03:38 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: Remember this: I prefer direct communication with no fluff",
+    "response": "I'd be happy to help you with OptimiserClaw Test Bot! It sounds like you're working on a project related to cost-optimized AI routing.Could you tell me a bit more about what you're looking to do? For example, are you:\nBuilding this routing system from scratch?\nLooking for advice on architecture or implementation approaches?\nTrying to integrate multiple AI providers/models?\nWorking on the decision logic for when to route to different models?\nSomething else entirely?\nThe more context you can share about your goals and",
+    "cost": 0,
+    "responseTime": 31.151,
+    "routingReason": "Complex task, using Pro subscription"
+  },
+  {
+    "timestamp": 1770651579181,
+    "provider": "claude-browser",
+    "model": "claude-sonnet-4",
+    "prompt": "Current time: Monday, February 9, 2026 at 03:39 PM (Europe/London)\nPlatform: Telegram - Keep responses concise and mobile-friendly. Markdown supported.\nLocation: Derbyshire, UK\nOptimiserClaw Test Bot - Cost-optimized AI routing\n\nUser: /memory",
+    "response": "I can help you with information about cost-optimized AI routing! Are you:\nB",
+    "cost": 0,
+    "responseTime": 25.889,
+    "routingReason": "Complex task, using Pro subscription"
+  }
+]

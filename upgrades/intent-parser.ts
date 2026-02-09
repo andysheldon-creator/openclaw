@@ -253,7 +253,7 @@ The tags will be stripped before the user sees your response.
 }
 
 // CLI test
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   (async () => {
     console.log('=== Intent Parser Test ===\n');
     

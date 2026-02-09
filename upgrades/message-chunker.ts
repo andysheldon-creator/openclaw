@@ -233,7 +233,7 @@ function splitCodeBlock(codeBlock: string, maxLength: number): string[] {
 }
 
 // CLI test
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const testText = `
 This is a test message that is very long and needs to be split.
 

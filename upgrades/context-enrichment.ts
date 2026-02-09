@@ -188,7 +188,7 @@ export function buildProactiveContext(options: {
 }
 
 // CLI test
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('=== Context Enrichment Test ===\n');
   
   const userMessage = "What should I work on next?";
