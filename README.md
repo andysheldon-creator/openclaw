@@ -1,3 +1,11 @@
+# 💰 OptimiserClaw — Cost-Optimized OpenClaw Fork
+
+> **🌟 This fork adds intelligent multi-tier model routing to reduce AI API costs by 90%.**  
+> See [`upgrades/`](./upgrades/) for implementation details and roadmap.  
+> Upstream: [openclaw/openclaw](https://github.com/openclaw/openclaw)
+
+---
+
 # 🦞 OpenClaw — Personal AI Assistant
 
 <p align="center">
