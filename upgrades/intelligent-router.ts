@@ -56,19 +56,25 @@ export class IntelligentRouter {
   analyzeTask(prompt: string, context?: string[]): TaskAnalysis {
     const lowerPrompt = prompt.toLowerCase();
     
+    console.log(`🔍 Analyzing prompt: "${prompt.substring(0, 100)}..."`);
+    console.log(`🔍 Context items: ${context?.length || 0}`);
+    
     // Detect task type
     let taskType: TaskAnalysis['taskType'] = 'general';
     
     if (this.isCodeTask(lowerPrompt)) {
       taskType = 'code';
+      console.log(`🔍 Detected as CODE task`);
     } else if (this.isMathTask(lowerPrompt)) {
       taskType = 'math';
     } else if (this.isReasoningTask(lowerPrompt)) {
       taskType = 'reasoning';
     } else if (this.isCreativeTask(lowerPrompt)) {
       taskType = 'creative';
+      console.log(`🔍 Detected as CREATIVE task`);
     } else if (this.isFactualTask(lowerPrompt)) {
       taskType = 'factual';
+      console.log(`🔍 Detected as FACTUAL task`);
     }
 
     // Calculate complexity (0-1)
@@ -129,12 +135,12 @@ export class IntelligentRouter {
   private routeCostOptimized(analysis: TaskAnalysis): RoutingDecision {
     // ALWAYS prefer OpenRouter for any task (cheap, fast, reliable)
     if (this.allowOpenRouter) {
-      // Simple/trivial tasks → Small cheap models
+      // Simple/trivial tasks → Free models
       if (analysis.complexity < 0.3) {
         return {
           provider: 'openrouter',
-          model: 'google/gemini-2.0-flash-thinking-exp:free',
-          reason: 'Simple task, free model',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          reason: 'Simple task, free Llama 3.3 70B model',
           estimatedCost: 0,
           estimatedTime: 2,
         };
